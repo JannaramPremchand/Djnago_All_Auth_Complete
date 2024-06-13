@@ -1,0 +1,83 @@
+{% extends "usersessions/base_manage.html" %}
+{% load allauth %}
+{% load i18n %}
+{% load humanize %}
+
+{% block head_title %}
+    {% trans "Sessions" %}
+{% endblock head_title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title">
+                            {% trans "Sessions" %}
+                        </h1>
+                    </div>
+                    <div class="card-body">
+                        {% if session_count > 1 %}
+                            {% url 'usersessions_list' as action_url %}
+                        {% else %}
+                            {% url 'account_logout' as action_url %}
+                        {% endif %}
+                        <form action="{{ action_url }}" method="post">
+                            {% csrf_token %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">{% translate "Started At" %}</th>
+                                            <th scope="col">{% translate "IP Address" %}</th>
+                                            <th scope="col">{% translate "Browser" %}</th>
+                                            {% if show_last_seen_at %}
+                                                <th scope="col">{% translate "Last seen at" %}</th>
+                                            {% endif %}
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for session in sessions %}
+                                            <tr>
+                                                <td>
+                                                    <span title="{{ session.created_at }}">{{ session.created_at|naturaltime }}</span>
+                                                </td>
+                                                <td>{{ session.ip }}</td>
+                                                <td>{{ session.user_agent }}</td>
+                                                {% if show_last_seen_at %}
+                                                    <td>
+                                                        <span title="{{ session.last_seen_at }}">{{ session.last_seen_at|naturaltime }}</span>
+                                                    </td>
+                                                {% endif %}
+                                                <td>
+                                                    {% if session.is_current %}
+                                                        <span class="badge badge-info">
+                                                            {% translate "Current" %}
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center">
+                                {% if session_count > 1 %}
+                                    <button type="submit" class="btn btn-danger">
+                                        {% translate "Sign Out Other Sessions" %}
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-danger">
+                                        {% translate "Sign Out" %}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

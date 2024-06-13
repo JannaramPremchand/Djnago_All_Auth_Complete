@@ -1,0 +1,46 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+{% load allauth account %}
+{% block head_title %}
+    {% translate "Sign In" %}
+{% endblock head_title %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="mt-5 mb-4 text-center">
+                {% translate "Mail me a sign-in code" %}
+            </h1>
+
+            {% element p %}
+                {% blocktranslate %}You will receive an email containing a special code for a password-free sign-in.{% endblocktranslate %}
+            {% endelement %}
+
+            <form method="post" action="{% url 'account_request_login_code' %}" class="mt-4">
+                {% csrf_token %}
+                {{ redirect_field }}
+
+                <div class="form-group">
+                    {% element field form=form.email type="email" %}
+                    <label for="{{ form.email.id_for_label }}">
+                        {% translate "Email Address" %}
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    {% translate "Request Code" %}
+                </button>
+            </form>
+
+            <div class="mt-4 text-center">
+                <h2>
+                    {% url 'account_login' as login_url %}
+                    <a href="{{ login_url }}" class="btn btn-link">
+                        {% translate "Other sign-in options" %}
+                    </a>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,39 @@
+{% extends "socialaccount/base_entrance.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block head_title %}
+    {% trans "Signup" %}
+{% endblock head_title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title text-center">{% trans "Sign Up" %}</h1>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+                                You are about to use your {{ provider_name }} account to sign up for {{ site_name }}.
+                                As a final step, please complete the following form:
+                            {% endblocktrans %}
+                        </p>
+                        <form method="post" action="{% url 'socialaccount_signup' %}">
+                            {% csrf_token %}
+                            {% element fields form=form unlabeled=True %}
+                            {{ redirect_field }}
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">
+                                    {% trans "Sign Up" %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

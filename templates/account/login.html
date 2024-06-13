@@ -1,0 +1,55 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+{% load allauth account %}
+
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="card-title text-center">{% trans "Sign In" %}</h1>
+                    {% if not SOCIALACCOUNT_ONLY %}
+                    <p class="card-text text-center">
+                        {% blocktranslate %}If you have not created an account yet, then please
+                            <a href="{{ signup_url }}">sign up</a> first.{% endblocktranslate %}
+                    </p>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'account_login' %}" class="entrance login">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {% element fields form=form unlabeled=True %}{% endelement %}
+                            {{ redirect_field }}
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                {% trans "Sign In" %}
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% if LOGIN_BY_CODE_ENABLED %}
+                    <hr>
+                    <h2 class="text-center">
+                        <a href="{{ request_login_code_url }}" class="btn btn-outline-secondary">
+                            {% trans "Mail me a sign-in code" %}
+                        </a>
+                    </h2>
+                    {% endif %}
+                    
+                    {% if SOCIALACCOUNT_ENABLED %}
+                    <div class="text-center mt-4">
+                        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

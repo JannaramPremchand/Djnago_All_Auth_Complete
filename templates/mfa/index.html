@@ -1,0 +1,81 @@
+{% extends "mfa/base_manage.html" %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% trans "Two-Factor Authentication" %}
+{% endblock head_title %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mt-5 mb-4 text-center">
+                {% trans "Two-Factor Authentication" %}
+            </h1>
+
+            {% if "totp" in MFA_SUPPORTED_TYPES %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        {% trans "Authenticator App" %}
+                    </div>
+                    <div class="card-body">
+                        {% if authenticators.totp %}
+                            <p class="card-text text-success">
+                                {% translate "Authentication using an authenticator app is active." %}
+                            </p>
+                            <a href="{% url 'mfa_deactivate_totp' %}" class="btn btn-danger">
+                                {% translate "Deactivate" %}
+                            </a>
+                        {% else %}
+                            <p class="card-text text-warning">
+                                {% translate "An authenticator app is not active." %}
+                            </p>
+                            <a href="{% url 'mfa_activate_totp' %}" class="btn btn-primary">
+                                {% translate "Activate" %}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if "recovery_codes" in MFA_SUPPORTED_TYPES %}
+                {% with total_count=authenticators.recovery_codes.generate_codes|length unused_count=authenticators.recovery_codes.get_unused_codes|length %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            {% trans "Recovery Codes" %}
+                        </div>
+                        <div class="card-body">
+                            {% if authenticators.recovery_codes %}
+                                <p class="card-text">
+                                    {% blocktranslate count unused_count=unused_count %}
+                                        There is {{ unused_count }} out of {{ total_count }} recovery codes available.
+                                    {% plural %}
+                                        There are {{ unused_count }} out of {{ total_count }} recovery codes available.
+                                    {% endblocktranslate %}
+                                </p>
+                            {% else %}
+                                <p class="card-text">
+                                    {% translate "No recovery codes set up." %}
+                                </p>
+                            {% endif %}
+                        </div>
+                        {% if is_mfa_enabled and authenticators.recovery_codes %}
+                            <div class="card-footer">
+                                {% if unused_count > 0 %}
+                                    <a href="{% url 'mfa_view_recovery_codes' %}" class="btn btn-primary">
+                                        {% translate "View" %}
+                                    </a>
+                                    <a href="{% url 'mfa_download_recovery_codes' %}" class="btn btn-secondary ml-2">
+                                        {% translate "Download" %}
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'mfa_generate_recovery_codes' %}" class="btn btn-secondary ml-2">
+                                    {% translate "Generate" %}
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

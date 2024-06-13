@@ -1,0 +1,94 @@
+{% extends "account/base_manage_email.html" %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% trans "Email Addresses" %}
+{% endblock head_title %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mt-5 mb-4 text-center">
+                {% trans "Email Addresses" %}
+            </h1>
+
+            {% if emailaddresses %}
+                <p class="lead">
+                    {% trans 'The following email addresses are associated with your account:' %}
+                </p>
+
+                {% url 'account_email' as email_url %}
+                <form action="{{ email_url }}" method="post" class="email-list">
+                    {% csrf_token %}
+                    {% for radio in emailaddress_radios %}
+                        {% with emailaddress=radio.emailaddress %}
+                            <div class="form-group">
+                                <input type="radio" id="{{ radio.id }}" name="email" value="{{ emailaddress.email }}" {% if radio.checked %}checked{% endif %}>
+                                <label for="{{ radio.id }}">
+                                    {{ emailaddress.email }}
+                                    {% if emailaddress.verified %}
+                                        <span class="badge badge-success">{% translate "Verified" %}</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">{% translate "Unverified" %}</span>
+                                    {% endif %}
+                                    {% if emailaddress.primary %}
+                                        <span class="badge badge-primary">{% translate "Primary" %}</span>
+                                    {% endif %}
+                                </label>
+                            </div>
+                        {% endwith %}
+                    {% endfor %}
+
+                    <div class="form-group">
+                        <button type="submit" name="action_primary" class="btn btn-primary">
+                            {% trans 'Make Primary' %}
+                        </button>
+                        <button type="submit" name="action_send" class="btn btn-secondary">
+                            {% trans 'Re-send Verification' %}
+                        </button>
+                        <button type="submit" name="action_remove" class="btn btn-danger">
+                            {% trans 'Remove' %}
+                        </button>
+                    </div>
+                </form>
+
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    {% include "account/snippets/warn_no_email.html" %}
+                </div>
+            {% endif %}
+
+            {% if can_add_email %}
+                <h2 class="mt-4">
+                    {% trans "Add Email Address" %}
+                </h2>
+
+                {% url 'account_email' as action_url %}
+                <form action="{{ action_url }}" method="post" class="email-add">
+                    {% csrf_token %}
+                    {% element fields form=form %}{% endelement %}
+
+                    <button type="submit" name="action_add" class="btn btn-primary">
+                        {% trans "Add Email" %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_body %}
+<script type="text/javascript">
+(function() {
+    var message = "{% trans 'Do you really want to remove the selected email address?' %}";
+    var actions = document.getElementsByName('action_remove');
+    if (actions.length) {
+        actions[0].addEventListener("click", function(e) {
+            if (!confirm(message)) {
+                e.preventDefault();
+            }
+        });
+    }
+})();
+</script>
+{% endblock extra_body %}

@@ -1,0 +1,91 @@
+{% extends "account/base_manage_email.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block head_title %}
+    {% trans "Email Address" %}
+{% endblock head_title %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mt-5 mb-4 text-center">
+                {% trans "Email Address" %}
+            </h1>
+
+            {% if not emailaddresses %}
+                <div class="alert alert-warning" role="alert">
+                    {% include "account/snippets/warn_no_email.html" %}
+                </div>
+            {% endif %}
+
+            {% url 'account_email' as action_url %}
+            <form method="post" action="{{ action_url }}" class="mt-4">
+                {% csrf_token %}
+                
+                {% if current_emailaddress %}
+                    <div class="form-group">
+                        <label for="current_email">{% translate "Current email" %}:</label>
+                        <input id="current_email" class="form-control" type="email" value="{{ current_emailaddress.email }}" disabled>
+                    </div>
+                {% endif %}
+                
+                {% if new_emailaddress %}
+                    <div class="form-group">
+                        <label for="new_email">
+                            {% if not current_emailaddress %}
+                                {% translate "Current email" %}:
+                            {% else %}
+                                {% translate "Changing to" %}:
+                            {% endif %}
+                        </label>
+                        <input id="new_email" class="form-control" type="email" value="{{ new_emailaddress.email }}" disabled>
+                        <small class="form-text text-muted">
+                            {% blocktranslate %}Your email address is still pending verification.{% endblocktranslate %}
+                        </small>
+                        <div class="mt-2">
+                            <button form="pending-email" type="submit" name="action_send" class="btn btn-sm btn-secondary">
+                                {% trans 'Re-send Verification' %}
+                            </button>
+                            {% if current_emailaddress %}
+                                <button form="pending-email" type="submit" name="action_remove" class="btn btn-sm btn-danger ml-2">
+                                    {% trans 'Cancel Change' %}
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">
+                        {% translate "Change to" %}:
+                    </label>
+                    <input id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" value="{{ form.email.value }}" class="form-control" type="email">
+                    {% if form.email.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <button type="submit" name="action_add" class="btn btn-primary">
+                    {% trans "Change Email" %}
+                </button>
+            </form>
+
+            {% if new_emailaddress %}
+                <form style="display: none"
+                      id="pending-email"
+                      method="post"
+                      action="{% url 'account_email' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" value="{{ new_emailaddress.email }}">
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

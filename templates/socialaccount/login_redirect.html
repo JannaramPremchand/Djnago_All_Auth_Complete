@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load i18n %}
+    <title>{% translate "Sign In" %} | {{ provider }}</title>
+    <meta http-equiv="refresh" content="0;URL='{{ redirect_to }}'" />
+</head>
+<body>
+    <p>
+        <a href="{{ redirect_to }}">{% translate "Continue" %}</a>
+    </p>
+</body>
+</html>

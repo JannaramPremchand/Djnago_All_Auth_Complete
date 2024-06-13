@@ -1,0 +1,51 @@
+{% extends "base_generic.html" %}
+
+{% load allauth i18n static %}
+
+{% block head_title %}
+    {% trans "Profile" %}
+{% endblock head_title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-4 mb-md-0">
+                            <!-- Placeholder for profile image -->
+                            <div class="profile-image-placeholder text-center">
+                                <!-- You can add your profile image here -->
+                                <img src="{% static 'assets/images/default-profile-image.jpg' %}" class="img-fluid rounded-circle" alt="Profile Image">
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h3>Personal Information</h3>
+                            <ul class="list-group">
+                                <li class="list-group-item">Username: {{ user.username }}</li>
+                                <li class="list-group-item">Email: {{ user.email }}</li>
+                                <li class="list-group-item">Date Joined: {{ user.date_joined|date:"F d, Y" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <h3>Manage Account</h3>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <a href="{% url 'account_change_password' %}" class="btn btn-outline-primary btn-block">Change Password</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{% url 'account_email' %}" class="btn btn-outline-primary btn-block">Change Email</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{% url 'account_logout' %}" class="btn btn-outline-danger btn-block">Sign Out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
